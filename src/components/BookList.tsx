@@ -6,12 +6,13 @@ import Book from "./Book";
 
 const BookList: React.FC = () => {
   const [books, setBooks] = useState<BookShort[]>([]);
+  const [selectedBook, setSelectedBook] = useState<BookShort | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://www.googleapis.com/books/v1/volumes?q=polishsupervisora&key=AIzaSyAMBoDWms1ft0BHXZqkWlSfPwzKYyz4ks8"
+          "https://www.googleapis.com/books/v1/volumes?q=react&key=AIzaSyAMBoDWms1ft0BHXZqkWlSfPwzKYyz4ks8"
         );
 
         const formattedBooks: BookShort[] = response.data.items.map(
@@ -44,22 +45,46 @@ const BookList: React.FC = () => {
 
         setBooks(formattedBooks);
       } catch (error) {
-        console.error("Błąd pobierania danych:", error);
+        console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
   }, []);
 
+  const handleBookSelect = (book: BookShort) => {
+    setSelectedBook((prevSelectedBook) => {
+      if (prevSelectedBook && prevSelectedBook.id === book.id) {
+        return null;
+      }
+      return book;
+    });
+  };
+
   return (
     <div>
       <h1>Lista książek</h1>
       {books.length > 0 ? (
-        <ul>
-          {books.map((book, index) => (
-            <Book key={index} book={book} />
-          ))}
-        </ul>
+        <table>
+          <thead>
+            <tr className='grid grid-cols-4'>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Kind</th>
+            </tr>
+          </thead>
+          <tbody>
+            {books.map((book, index) => (
+              <Book
+                key={index}
+                book={book}
+                onSelect={() => handleBookSelect(book)}
+                isSelected={selectedBook?.id === book.id}
+              />
+            ))}
+          </tbody>
+        </table>
       ) : (
         <p>Loading books...</p>
       )}

@@ -1,34 +1,42 @@
 import React from "react";
+import { motion } from "framer-motion";
 import BookShort from "../types/BookShort";
+import AuthorsBooks from "./AuthorsBooks";
 
 interface BookProps {
   book: BookShort;
+  onSelect: () => void;
+  isSelected: boolean;
 }
 
-const Book: React.FC<BookProps> = ({ book }) => {
+const Book: React.FC<BookProps> = ({ book, onSelect, isSelected }) => {
+  const rowStyle = isSelected ? { backgroundColor: "yellow" } : {};
+
   return (
-    <div className='bg-white rounded-lg shadow-md p-6 mb-4'>
-      <h2 className='text-xl font-semibold mb-2'>{book.title}</h2>
-      <p className='text-gray-700 mb-2'>
-        <span className='font-semibold'>ID:</span> {book.id}
-      </p>
-      <p className='text-gray-700 mb-2'>
-        <span className='font-semibold'>Author:</span> {book.author}
-      </p>
-      <p className='text-gray-700 mb-2'>
-        <span className='font-semibold'>Kind:</span> {book.kind}
-      </p>
-      <p className='text-gray-700 mb-2'>
-        <span className='font-semibold'>Description:</span> {book.description}
-      </p>
-      <p className='text-gray-700 mb-2'>
-        <span className='font-semibold'>Page Count:</span> {book.pageCount}
-      </p>
-      <p className='text-gray-700 mb-2'>
-        <span className='font-semibold'>Published Date:</span>{" "}
-        {book.publishedDate}
-      </p>
-    </div>
+    <motion.div layout style={rowStyle}>
+      <motion.tr
+        className='cursor-pointer grid grid-cols-4'
+        layout
+        onClick={onSelect}
+      >
+        <motion.td layout>{book.id}</motion.td>
+        <motion.td layout>{book.title}</motion.td>
+        <motion.td layout>{book.author}</motion.td>
+        <motion.td layout>{book.kind}</motion.td>
+      </motion.tr>
+      {isSelected && (
+        <motion.div className='overflow-hidden'>
+          <motion.tr layout className='flex flex-col'>
+            <motion.td colSpan={4} layout>
+              {!book.description ? "No description" : book.description}
+            </motion.td>
+            <motion.td colSpan={4} layout>
+              <AuthorsBooks author={book.author} />
+            </motion.td>
+          </motion.tr>
+        </motion.div>
+      )}
+    </motion.div>
   );
 };
 
