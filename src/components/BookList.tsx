@@ -86,7 +86,7 @@ const BookList: React.FC = () => {
         <table>
           {books.length > 0 && (
             <thead>
-              <tr className='hidden md:grid grid-cols-4 text-left my-2 text-lg'>
+              <tr className='hidden md:grid grid-cols-4 gap-4 text-left my-2 text-lg'>
                 <th>Cover</th>
                 <th>Title</th>
                 <th>Author</th>
