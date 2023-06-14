@@ -7,6 +7,7 @@ import Breadcrumb from "./Breadcrumb";
 import Loader from "./Loader";
 
 const BookList: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(true);
   const [books, setBooks] = useState<BookShort[]>([]);
   const [selectedBook, setSelectedBook] = useState<BookShort | null>(null);
   const [searchTerm, setSearchTerm] = useState("habits");
@@ -14,7 +15,6 @@ const BookList: React.FC = () => {
   const [breadcrumb, setBreadcrumb] = useState<(string | BookShort)[]>([
     searchInput,
   ]);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
