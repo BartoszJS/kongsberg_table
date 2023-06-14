@@ -1,62 +1,34 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import BookType from "../types/BookType";
+
+import { fetchBooks } from "../api/api";
 import BookShort from "../types/BookShort";
 import Book from "./Book";
+import Breadcrumb from "./Breadcrumb";
+import Loader from "./Loader";
 
 const BookList: React.FC = () => {
   const [books, setBooks] = useState<BookShort[]>([]);
   const [selectedBook, setSelectedBook] = useState<BookShort | null>(null);
-  const [searchTerm, setSearchTerm] = useState("react");
-  const [searchInput, setSearchInput] = useState("react");
+  const [searchTerm, setSearchTerm] = useState("habits");
+  const [searchInput, setSearchInput] = useState("habits");
   const [breadcrumb, setBreadcrumb] = useState<(string | BookShort)[]>([
     searchInput,
   ]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `https://www.googleapis.com/books/v1/volumes?q=${searchTerm}&key=AIzaSyAMBoDWms1ft0BHXZqkWlSfPwzKYyz4ks8`
-        );
+      setIsLoading(true);
 
-        const formattedBooks: BookShort[] = response.data.items.map(
-          (item: BookType) => {
-            const {
-              id,
-              kind,
-              volumeInfo: {
-                title,
-                authors,
-                description,
-                pageCount,
-                publishedDate,
-              },
-            } = item;
-
-            const author = authors ? authors.join(", ") : "Unknown";
-
-            return {
-              id,
-              title,
-              author,
-              kind,
-              description,
-              pageCount,
-              publishedDate,
-            };
-          }
-        );
-
+      if (searchTerm !== "") {
+        const formattedBooks = await fetchBooks(searchTerm);
         setBooks(formattedBooks);
-      } catch (error) {
-        console.error("Error fetching data:", error);
       }
+
+      setIsLoading(false);
     };
 
-    if (searchTerm !== "") {
-      fetchData();
-    }
+    fetchData();
   }, [searchTerm]);
 
   const handleBookSelect = (book: BookShort) => {
@@ -77,56 +49,68 @@ const BookList: React.FC = () => {
   };
 
   const handleBreadcrumbClick = (index: number) => {
+    setBreadcrumb((prevBreadcrumb) => prevBreadcrumb.slice(0, index + 1));
     if (index === 0) {
       setSelectedBook(null);
     }
   };
 
   return (
-    <div>
-      <h1>Lista książek</h1>
-      {breadcrumb.length > 0 && (
-        <div>
-          {breadcrumb.map((item, index) => (
-            <button key={index} onClick={() => handleBreadcrumbClick(index)}>
-              {typeof item === "string" ? item : item.title}
-              {">"}
-            </button>
-          ))}
-        </div>
-      )}
-      <form onSubmit={handleSearch}>
-        <input
-          type='text'
-          value={searchInput}
-          onChange={(event) => setSearchInput(event.target.value)}
-          placeholder='Wyszukaj książkę...'
+    <div className='text-white max-w-7xl mx-auto mt-10 mb-10'>
+      <h1 className='text-3xl font-semibold text-center'>BOOK LIST</h1>
+      <div className='flex flex-col justify-between lg:flex-row'>
+        <Breadcrumb
+          breadcrumb={breadcrumb}
+          onBreadcrumbClick={handleBreadcrumbClick}
         />
-        <button type='submit'>Szukaj</button>
-      </form>
-      {books.length > 0 ? (
+        <form className='flex justify-end m-2' onSubmit={handleSearch}>
+          <input
+            type='text'
+            className='text-black h-8 rounded-l-md pl-1'
+            value={searchInput}
+            onChange={(event) => setSearchInput(event.target.value)}
+            placeholder='Search...'
+          />
+          <button
+            className='bg-[#00000033] pl-4 pr-4 rounded-r-md hover:bg-[#00000066]'
+            type='submit'
+          >
+            Search
+          </button>
+        </form>
+      </div>
+
+      {isLoading ? (
+        <Loader height={200} width={200} />
+      ) : (
         <table>
-          <thead>
-            <tr className='grid grid-cols-4'>
-              <th>ID</th>
-              <th>Title</th>
-              <th>Author</th>
-              <th>Kind</th>
-            </tr>
-          </thead>
+          {books.length > 0 && (
+            <thead>
+              <tr className='hidden md:grid grid-cols-4 text-left my-2 text-lg'>
+                <th>Cover</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Category</th>
+              </tr>
+            </thead>
+          )}
           <tbody>
-            {books.map((book, index) => (
-              <Book
-                key={index}
-                book={book}
-                onSelect={() => handleBookSelect(book)}
-                isSelected={selectedBook?.id === book.id}
-              />
-            ))}
+            {books.length > 0 ? (
+              books.map((book, index) => (
+                <Book
+                  key={index}
+                  book={book}
+                  onSelect={() => handleBookSelect(book)}
+                  isSelected={selectedBook?.id === book.id}
+                />
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4}>No books found.</td>
+              </tr>
+            )}
           </tbody>
         </table>
-      ) : (
-        <p>Loading books...</p>
       )}
     </div>
   );

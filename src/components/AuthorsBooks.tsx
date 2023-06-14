@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import axios from "axios";
+
+import { fetchAuthorBooks } from "../api/api";
+import Loader from "./Loader";
+
 interface BookShort {
   id: string;
   title: string;
@@ -13,17 +15,14 @@ interface BookDetailsProps {
 
 const AuthorsBooks: React.FC<BookDetailsProps> = ({ author }) => {
   const [authorBooks, setAuthorBooks] = useState<BookShort[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `https://www.googleapis.com/books/v1/volumes?q=inauthor:${encodeURIComponent(
-            author
-          )}&maxResults=5&orderBy=newest&key=AIzaSyAMBoDWms1ft0BHXZqkWlSfPwzKYyz4ks8`
-        );
+        const books = await fetchAuthorBooks(author);
 
-        const formattedBooks: BookShort[] = response.data.items.reduce(
+        const formattedBooks: BookShort[] = books.reduce(
           (books: BookShort[], item: any) => {
             const {
               id,
@@ -52,8 +51,9 @@ const AuthorsBooks: React.FC<BookDetailsProps> = ({ author }) => {
         );
 
         setAuthorBooks(formattedBooks);
+        setIsLoading(false);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        setIsLoading(false);
       }
     };
 
@@ -62,16 +62,22 @@ const AuthorsBooks: React.FC<BookDetailsProps> = ({ author }) => {
 
   return (
     <div>
-      <h2>Author: {author}</h2>
-      <h3>Books written by {author}:</h3>
-      {authorBooks.length > 0 ? (
-        <ul>
-          {authorBooks.map((book) => (
-            <li key={book.id}>{book.title}</li>
-          ))}
-        </ul>
+      {isLoading ? (
+        <Loader height={100} width={100} />
       ) : (
-        <p>No books</p>
+        <>
+          {authorBooks.length > 0 ? (
+            <ul className='mx-4 mb-8'>
+              {authorBooks.map((book) => (
+                <li className='m-2' key={book.id}>
+                  {book.title}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className='mb-8'>No books</p>
+          )}
+        </>
       )}
     </div>
   );
