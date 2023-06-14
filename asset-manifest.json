@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/kongsberg_table/static/css/main.dcda9a91.css",
-    "main.js": "/kongsberg_table/static/js/main.f1217b40.js",
+    "main.js": "/kongsberg_table/static/js/main.03bfc755.js",
     "index.html": "/kongsberg_table/index.html",
     "static/media/Eclipse200px.svg": "/kongsberg_table/static/media/Eclipse200px.2f4bc5a3ecc9c4f1b4c6438e4410217b.svg",
     "main.dcda9a91.css.map": "/kongsberg_table/static/css/main.dcda9a91.css.map",
-    "main.f1217b40.js.map": "/kongsberg_table/static/js/main.f1217b40.js.map"
+    "main.03bfc755.js.map": "/kongsberg_table/static/js/main.03bfc755.js.map"
   },
   "entrypoints": [
     "static/css/main.dcda9a91.css",
-    "static/js/main.f1217b40.js"
+    "static/js/main.03bfc755.js"
   ]
 }
