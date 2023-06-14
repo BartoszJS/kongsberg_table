@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import BookShort from "../types/BookShort";
 import AuthorsBooks from "./AuthorsBooks";
@@ -10,33 +10,44 @@ interface BookProps {
 }
 
 const Book: React.FC<BookProps> = ({ book, onSelect, isSelected }) => {
+  const [showAuthorsBooks, setShowAuthorsBooks] = useState(false);
+
   const rowStyle = isSelected ? { backgroundColor: "yellow" } : {};
 
+  const handleToggleAuthorsBooks = () => {
+    setShowAuthorsBooks(!showAuthorsBooks);
+  };
+
   return (
-    <motion.div layout style={rowStyle}>
-      <motion.tr
-        className='cursor-pointer grid grid-cols-4'
-        layout
-        onClick={onSelect}
-      >
-        <motion.td layout>{book.id}</motion.td>
-        <motion.td layout>{book.title}</motion.td>
-        <motion.td layout>{book.author}</motion.td>
-        <motion.td layout>{book.kind}</motion.td>
-      </motion.tr>
+    <div style={rowStyle}>
+      <tr className='cursor-pointer grid grid-cols-4' onClick={onSelect}>
+        <td>{book.id}</td>
+        <td>{book.title}</td>
+        <td>{book.author}</td>
+        <td>{book.kind}</td>
+      </tr>
       {isSelected && (
-        <motion.div className='overflow-hidden'>
-          <motion.tr layout className='flex flex-col'>
-            <motion.td colSpan={4} layout>
+        <div className='overflow-hidden'>
+          <tr className='flex flex-col'>
+            <td colSpan={4}>
               {!book.description ? "No description" : book.description}
-            </motion.td>
-            <motion.td colSpan={4} layout>
-              <AuthorsBooks author={book.author} />
-            </motion.td>
-          </motion.tr>
-        </motion.div>
+            </td>
+            <td colSpan={4}>
+              <button onClick={handleToggleAuthorsBooks}>Show Books</button>
+            </td>
+          </tr>
+        </div>
       )}
-    </motion.div>
+      {isSelected && showAuthorsBooks && (
+        <div className='overflow-hidden'>
+          <tr className='flex flex-col'>
+            <td colSpan={4}>
+              <AuthorsBooks author={book.author} />
+            </td>
+          </tr>
+        </div>
+      )}
+    </div>
   );
 };
 
